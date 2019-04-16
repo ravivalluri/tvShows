@@ -1,0 +1,164 @@
+<div class="series-background"
+  [style.background-image]="'url(https://cdn.episode.ninja/file/episodeninja/' + series.id + '.jpg)'">
+  <div class="container text-white">
+    <div class="series-text col-lg-9 px-0">
+      <h1 class="series-name pt-1 mb-0">The {{worst ? 'Worst' : 'Best'}} {{bestSeasons ? 'Seasons' : 'Episodes'}} of
+        {{series.seriesName}}</h1>
+      <p class="series-description mb-1 mb-sm-3">Last Updated: {{series.updatedAt | date}}</p>
+      <p class="series-description mb-lg-5 mb-xl-5">{{series.overview}}</p>
+    </div>
+  </div>
+</div>
+<nav class="series-nav mb-2 mb-sm-3">
+  <div class="container">
+    <div class="hidden-sm-up row">
+      <a [href]="'https://facebook.com/' + this.router.url" target="_blank" rel="noopener"
+        aria-label="Share on Facebook" class="sharing-button facebook col" title="Share on Facebook">
+        <svg width="20" height="20" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
+          clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414">
+          <path
+            d="M15.117 0H.883C.395 0 0 .395 0 .883v14.234c0 .488.395.883.883.883h7.663V9.804H6.46V7.39h2.086V5.607c0-2.066 1.262-3.19 3.106-3.19.883 0 1.642.064 1.863.094v2.16h-1.28c-1 0-1.195.48-1.195 1.18v1.54h2.39l-.31 2.42h-2.08V16h4.077c.488 0 .883-.395.883-.883V.883C16 .395 15.605 0 15.117 0"
+            fill-rule="nonzero" /></svg>
+        <span>Share</span>
+      </a>
+
+      <a [href]="'https://twitter.com/' + this.router.url" target="_blank" rel="noopener" aria-label="Share on Twitter"
+        class="sharing-button twitter col" title="Share on Twitter">
+        <svg width="20" height="20" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
+          clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414">
+          <path
+            d="M16 3.038c-.59.26-1.22.437-1.885.517.677-.407 1.198-1.05 1.443-1.816-.634.37-1.337.64-2.085.79-.598-.64-1.45-1.04-2.396-1.04-1.812 0-3.282 1.47-3.282 3.28 0 .26.03.51.085.75-2.728-.13-5.147-1.44-6.766-3.42C.83 2.58.67 3.14.67 3.75c0 1.14.58 2.143 1.46 2.732-.538-.017-1.045-.165-1.487-.41v.04c0 1.59 1.13 2.918 2.633 3.22-.276.074-.566.114-.865.114-.21 0-.41-.02-.61-.058.42 1.304 1.63 2.253 3.07 2.28-1.12.88-2.54 1.404-4.07 1.404-.26 0-.52-.015-.78-.045 1.46.93 3.18 1.474 5.04 1.474 6.04 0 9.34-5 9.34-9.33 0-.14 0-.28-.01-.42.64-.46 1.2-1.04 1.64-1.7z"
+            fill-rule="nonzero" /></svg>
+        <span>Tweet</span>
+      </a>
+    </div>
+    <div class="row">
+      <a class="col series-nav-link" [class.active]="!worst && !bestSeasons"
+        *ngIf="series.totalEpisodes >= 50 || series.totalSeasons >= 4" [routerLink]="'/series/' + series.slug">
+        Best Episodes
+      </a>
+      <a class="col series-nav-link" [class.active]="worst" *ngIf="series.totalEpisodes >= 50"
+        [routerLink]="'/series/' + series.slug + '/worst-episodes'">
+        Worst Episodes
+      </a>
+      <a class="col series-nav-link" [class.active]="bestSeasons" *ngIf="series.totalSeasons >= 4"
+        [routerLink]="'/series/' + series.slug + '/best-seasons'">
+        Best Seasons
+      </a>
+    </div>
+  </div>
+</nav>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-9 content">
+      <ng-template ngFor let-index="index" let-episode [ngForOf]="series.episodes">
+        <div class="card mt-1 mb-3">
+          <div class="row align-items-center">
+            <div class="col-sm-12 col-md-6 col-lg-5">
+              <img class="img-fluid w-100" [src]="episodeImage(episode)" [alt]="episode.episodeName"
+                (error)="episode.filename = series.fanart">
+            </div>
+
+            <div class="col-sm-12 col-md-6 col-lg-7 h-100 py-3 px-4 px-sm-4">
+              <h2 class="h2 card-title mb-1">
+                #{{index + 1}} - {{episode.episodeName}}
+              </h2>
+              <h3 class="h6 card-subtitle text-muted mb-3">Season {{episode.airedSeason}} - Episode
+                {{episode.airedEpisodeNumber}}</h3>
+              <p class="card-text mr-3">{{episode.overview}}</p>
+              <div class="float-right text-muted mx-3">
+                <div class="episode-rating">
+                  <img src="/assets/star.svg" alt="star" width="25" height="25" class="align-top">
+                  {{episode.rating | number: '1.2-2'}}
+                </div>
+                {{episode.ratingCount | number:'.0'}} votes
+              </div>
+              <div *ngIf="episode.directors.length" class="mb-1">
+                Directors: <a *ngFor="let director of episode.directors; let i = index;"
+                  [routerLink]="'/director/' + director.slug">
+                  {{director.name}}<span *ngIf="i !== episode.directors.length - 1">, </span>
+                </a>
+              </div>
+              <div *ngIf="episode.directors.length" class="mb-3">
+                Writers: <span *ngFor="let writer of episode.writers; let i = index;">
+                  {{writer}}<span *ngIf="i !== episode.writers.length - 1">, </span>
+                </span>
+              </div>
+              <a [href]="episode.watchLinks[0]?.amazon" *ngIf="episode.watchLinks && episode.watchLinks[0]?.amazon"
+                target="_blank" rel="noopener" class="btn btn-warning btn-sm mb-1">
+                Watch on Amazon
+              </a>
+              <a [href]="episode.itunes" *ngIf="episode.itunes" target="_blank" rel="noopener"
+                class="btn btn-secondary btn-sm mb-1">
+                Buy on iTunes
+              </a>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span style="font-family: Oswald; font-size: 18px; line-height: 25px;">Rate This Episode:</span>
+            <star-rating [starType]="'svg'" class="float-right"
+              [rating]="episode.ratings?.length ? episode.ratings[0]?.rating / 2 : 0"
+              (starClickChange)="onRatingChange($event, episode)"></star-rating>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template ngFor let-index="index" let-season [ngForOf]="series.seasons">
+        <div class="card mt-1 mb-3">
+          <div class="row align-items-center">
+            <div class="col-sm-12 col-md-6 col-lg-5">
+              <img class="img-fluid w-100" [src]="seasonImage(season)" [alt]="season.title" *ngIf="season.id">
+            </div>
+
+            <div class="col-sm-12 col-md-6 col-lg-7 h-100 py-3 px-4 px-sm-4">
+              <h2 class="h2 card-title mb-1">
+                #{{index + 1}} - {{season.title}}
+              </h2>
+              <h3 class="h6 card-subtitle text-muted mb-3">First Aired: {{season.first_aired | date}}</h3>
+              <p class="card-text mr-3">{{season.overview}}</p>
+              <div class="float-right text-muted mx-3 mt-3">
+                <div class="episode-rating">
+                  <img src="/assets/star.svg" alt="star" width="25" height="25" class="align-top">
+                  {{season.rating | number: '1.2-2'}}
+                </div>
+                {{season.votes | number:'.0'}} votes
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+    <aside class="col-lg-3 sidebar">
+      <div class="container mt-1 mb-3">
+        <div class="row">
+          <a [href]="'https://facebook.com/' + this.router.url" target="_blank" rel="noopener"
+            aria-label="Share on Facebook" class="sharing-button facebook col" title="Share on Facebook">
+            <svg width="20" height="20" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
+              clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414">
+              <path
+                d="M15.117 0H.883C.395 0 0 .395 0 .883v14.234c0 .488.395.883.883.883h7.663V9.804H6.46V7.39h2.086V5.607c0-2.066 1.262-3.19 3.106-3.19.883 0 1.642.064 1.863.094v2.16h-1.28c-1 0-1.195.48-1.195 1.18v1.54h2.39l-.31 2.42h-2.08V16h4.077c.488 0 .883-.395.883-.883V.883C16 .395 15.605 0 15.117 0"
+                fill-rule="nonzero" /></svg>
+            <span>Share</span>
+          </a>
+
+          <a [href]="'https://twitter.com/' + this.router.url" target="_blank" rel="noopener"
+            aria-label="Share on Twitter" class="sharing-button twitter col" title="Share on Twitter">
+            <svg width="20" height="20" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
+              clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414">
+              <path
+                d="M16 3.038c-.59.26-1.22.437-1.885.517.677-.407 1.198-1.05 1.443-1.816-.634.37-1.337.64-2.085.79-.598-.64-1.45-1.04-2.396-1.04-1.812 0-3.282 1.47-3.282 3.28 0 .26.03.51.085.75-2.728-.13-5.147-1.44-6.766-3.42C.83 2.58.67 3.14.67 3.75c0 1.14.58 2.143 1.46 2.732-.538-.017-1.045-.165-1.487-.41v.04c0 1.59 1.13 2.918 2.633 3.22-.276.074-.566.114-.865.114-.21 0-.41-.02-.61-.058.42 1.304 1.63 2.253 3.07 2.28-1.12.88-2.54 1.404-4.07 1.404-.26 0-.52-.015-.78-.045 1.46.93 3.18 1.474 5.04 1.474 6.04 0 9.34-5 9.34-9.33 0-.14 0-.28-.01-.42.64-.46 1.2-1.04 1.64-1.7z"
+                fill-rule="nonzero" /></svg>
+            <span>Tweet</span>
+          </a>
+        </div>
+      </div>
+
+      <iframe class="hidden-lg-down"
+        src="//rcm-na.amazon-adsystem.com/e/cm?o=1&p=49&l=ur1&category=primevideochannels&banner=0JWHPSPM710EH15QP5G2&f=ifr&linkID=42e8648ca77a512f28dfe8932ae28529&t=episodeninja-20&tracking_id=episodeninja-20"
+        width="300" height="600" scrolling="no" border="0" marginwidth="0" style="border:none;"
+        frameborder="0"></iframe>
+
+      <app-popular-shows sidebar="true" [shows]="series.relatedShows"></app-popular-shows>
+    </aside>
+  </div>
+</div>

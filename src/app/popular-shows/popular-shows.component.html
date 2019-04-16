@@ -1,0 +1,16 @@
+<div [class.sidebar]="sidebar" class="featured">
+  <h3 *ngIf="shows && shows.length">Similar Shows</h3>
+  <div *ngIf="shows && shows.length" class="row no-gutters mb-3">
+    <app-show-card *ngFor="let show of shows" [show]="show" class="col-sm-6 col-lg-4"></app-show-card>
+  </div>
+
+  <h3>Popular Shows</h3>
+  <div class="row no-gutters mb-3">
+    <app-show-card *ngFor="let show of popularShows" [show]="show" class="col-sm-6 col-lg-4"></app-show-card>
+  </div>
+
+  <h3>Recently Added Shows</h3>
+  <div class="row no-gutters">
+    <app-show-card *ngFor="let show of newShows" [show]="show" class="col-sm-6 col-lg-4"></app-show-card>
+  </div>
+</div>
